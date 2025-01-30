@@ -43,4 +43,46 @@
       });
     </script>
   </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const userForm = document.getElementById("user-form");
+      const exerciseForm = document.getElementById("exercise-form");
+      let userId = ""; // Store the user's ID after signup
+    
+      userForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const username = document.getElementById("username").value.trim();
+    
+        const response = await fetch("/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username })
+        });
+    
+        const data = await response.json();
+        userId = data._id;
+        alert(`User Created: ${data.username} (ID: ${data._id})`);
+      });
+    
+      exerciseForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!userId) return alert("Create a user first!");
+    
+        const postData = {
+          description: document.getElementById("desc").value,
+          duration: document.getElementById("dur").value,
+          date: document.getElementById("date").value || new Date().toISOString().split("T")[0],
+        };
+    
+        const response = await fetch(`/api/users/${userId}/exercises`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(postData)
+        });
+    
+        const data = await response.json();
+        alert(`Exercise Added: ${data.description}, ${data.duration} mins`);
+      });
+    });
+    </script>
 </html>
